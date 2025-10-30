@@ -18,9 +18,9 @@ public class AuthorController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] AuthorFilteringDto filteringDto)
     {
-        var authors = await _sender.Send(new GetAllAuthorsQuery());
+        var authors = await _sender.Send(new GetAllAuthorsQuery(filteringDto));
         return Ok(authors); 
     }
 

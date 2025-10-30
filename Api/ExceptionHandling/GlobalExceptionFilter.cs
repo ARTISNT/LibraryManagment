@@ -26,20 +26,27 @@ public class GlobalExceptionFilter : IExceptionFilter
                 notFound.Message, 
                 StatusCodes.Status404NotFound,
                 "Could not find any objects with the specified id."
-            ),
+                ),
+            NullReferenceException notNull =>
+            (
+                    notNull.Message,
+                    StatusCodes.Status404NotFound,
+                    "Could not find any objects with the specified id."
+                    ),
             ArgumentOutOfRangeException argumentOutOfRange => 
             (
                 argumentOutOfRange.Message,
                 StatusCodes.Status400BadRequest,
                 "Id should be greater than or equal to zero."
-            )
+                )
         };
 
         ProblemDetails problemDetails = new ProblemDetails
         {
             Title = title,
             Status = statusCode,
-            Instance = path
+            Instance = path,
+            Detail = detail,
         };
         
         problemDetails.Extensions["traceId"] = traceId;

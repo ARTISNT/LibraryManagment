@@ -18,9 +18,9 @@ public class BookController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] BookFilteringDto filteringDto)
     {
-        var books = await _sender.Send(new GetAllBooksQuery());
+        var books = await _sender.Send(new GetAllBooksQuery(filteringDto));
         return Ok(books);
     }
 

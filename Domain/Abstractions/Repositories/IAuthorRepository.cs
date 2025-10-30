@@ -4,9 +4,9 @@ namespace Domain.Abstractions.Repositories;
 
 public interface IAuthorRepository
 {
-    public Task<IReadOnlyCollection<AuthorEntity>> GetAll();
+    public IQueryable<AuthorEntity> GetAll();
     public Task<AuthorEntity> GetById(int id);
-    public Task<AuthorEntity> Create(AuthorEntity entity);
-    public Task<AuthorEntity> Update(int id, AuthorEntity entity);
+    public Task Create(AuthorEntity entity);
+    public Task Update(int id, AuthorEntity entity);
     public Task Delete(int id);
 }

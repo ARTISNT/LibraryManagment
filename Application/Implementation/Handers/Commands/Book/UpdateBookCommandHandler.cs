@@ -25,7 +25,7 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, int>
     {
         _businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
         var book = _mapper.Map<BookEntity>(request.BookDto);
-        await _bookRepository.Create(book);
+        await _bookRepository.Update(request.Id, book);
         
         return book.Id;
     }

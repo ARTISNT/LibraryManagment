@@ -1,9 +1,9 @@
-namespace Domain.Models.Entities;
+namespace Application.Dto.AuthorsDto;
 
-public class AuthorEntity
+public class AuthorResponseWithBookCountDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = String.Empty;
     public DateTime DateOfBirthday { get; set; }
-    public ICollection<BookEntity> Books { get; set; } 
+    public int? BooksCount { get; set; }
 }

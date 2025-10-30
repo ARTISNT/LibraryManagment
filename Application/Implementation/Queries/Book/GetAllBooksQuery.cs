@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Implementation.Queries.Book;
 
-public record GetAllBooksQuery() : IRequest<IEnumerable<BookDtoResponse>>;
+public record GetAllBooksQuery(BookFilteringDto BookFilteringDto) : IRequest<IEnumerable<BookDtoResponse>>;

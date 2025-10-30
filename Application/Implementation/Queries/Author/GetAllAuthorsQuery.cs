@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.Implementation.Queries.Author;
 
-public record GetAllAuthorsQuery() : IRequest<IEnumerable<AuthorResponseDto>>;
+public record GetAllAuthorsQuery(AuthorFilteringDto AuthorFilteringDto) : IRequest<IEnumerable<AuthorResponseWithBookCountDto>>;

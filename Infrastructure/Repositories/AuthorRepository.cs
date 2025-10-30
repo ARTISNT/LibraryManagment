@@ -1,59 +1,61 @@
 using Domain.Abstractions.Repositories;
 using Domain.Models.Entities;
 using Infrastructure.DB;
+using Infrastructure.DB.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class AuthorRepository : IAuthorRepository
 {
-    private IListDb _db;
-
-    public AuthorRepository(IListDb db)
+    private LibraryManagementDbContext  _libraryManagementDbContext;
+    public AuthorRepository(LibraryManagementDbContext libraryManagementDbContext)
     {
-        _db = db;
+        _libraryManagementDbContext = libraryManagementDbContext;
     }
 
-    public async Task<IReadOnlyCollection<AuthorEntity>> GetAll()
+    public IQueryable<AuthorEntity> GetAll()
     {
-        await Task.Delay(400);
-        return _db.Authors;
+        return _libraryManagementDbContext.Authors.AsQueryable();
     }
 
     public async Task<AuthorEntity?> GetById(int id)
     {
-        await Task.Delay(400);
-        return _db.Authors.FirstOrDefault(x => x.Id == id);
+        var author = await _libraryManagementDbContext.Authors.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(author);
+            
+        return author;
     }
 
-    public async Task<AuthorEntity> Create(AuthorEntity entity)
+    public async Task Create(AuthorEntity entity)
     {
-        await Task.Delay(400);
-        var authors = _db.Authors as List<AuthorEntity>;
-        
-        entity.Id = authors.Max(a => a.Id) + 1;
-        authors.Add(entity);
-        
-        return entity;
+        await _libraryManagementDbContext.Authors.AddAsync(entity);
+        await _libraryManagementDbContext.SaveChangesAsync();
     }
 
-    public async Task<AuthorEntity> Update(int id, AuthorEntity entity)
+    public async Task Update(int id, AuthorEntity entity)
     {
-        await Task.Delay(400);
-        var authors = _db.Authors as List<AuthorEntity>;
+        var author = await _libraryManagementDbContext.Authors.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(entity);
         
-        var updatedAuthor = authors.FirstOrDefault(a => a.Id == id);
+        author.Name = entity.Name;
+        author.DateOfBirthday =  entity.DateOfBirthday;
         
-        updatedAuthor.Name = entity.Name;
-        updatedAuthor.DateOfBirthday = entity.DateOfBirthday;
-        
-        return updatedAuthor;
+        await _libraryManagementDbContext.SaveChangesAsync();
     }
     
     public async Task Delete(int id)
     {
-        await Task.Delay(400);
+        var author = await _libraryManagementDbContext.Authors.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(author);
         
-        var authors = _db.Authors as List<AuthorEntity>;
-        authors.Remove(authors.FirstOrDefault(a => a.Id == id));
+        _libraryManagementDbContext.Authors.Remove(author);
+        await _libraryManagementDbContext.SaveChangesAsync();
+    }
+
+    private void CheckForNull(AuthorEntity entity)
+    {
+       if (entity == null)
+           throw new NullReferenceException("Author not found");
     }
 }

@@ -13,4 +13,8 @@ public class UpdateBookDto
     [Required]
     [ValidPublishYearAttribute(0, ErrorMessage = "Year must be between 0 and 2025")]
     public int PublishYear { get; set; }
+    
+    [Required]
+    [Range(0, int.MaxValue, ErrorMessage = "AuthorId must be greater than 0")]
+    public int AuthorId { get; set; }
 }

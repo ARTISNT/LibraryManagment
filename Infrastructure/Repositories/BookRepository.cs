@@ -1,60 +1,63 @@
 using Domain.Abstractions.Repositories;
 using Domain.Models.Entities;
 using Infrastructure.DB;
+using Infrastructure.DB.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class BookRepository : IBookRepository
 {
     
-    private IListDb _db;
-
-    public BookRepository(IListDb db)
+    private LibraryManagementDbContext _libraryManagementDbContext;
+    public BookRepository(LibraryManagementDbContext libraryManagementDbContext)
     {
-        _db = db;
+        _libraryManagementDbContext = libraryManagementDbContext;
     }
 
-    public async Task<IReadOnlyCollection<BookEntity>> GetAll()
+    public IQueryable<BookEntity> GetAll()
     {
-        await Task.Delay(400);
-        return _db.Books;
+        return _libraryManagementDbContext.Books;
     }
 
     public async Task<BookEntity?> GetById(int id)
     {
-        await Task.Delay(400);
-        return _db.Books.FirstOrDefault(x => x.Id == id);
+        var book = await _libraryManagementDbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(book);
+        
+        return book;
     }
 
-    public async Task<BookEntity> Create(BookEntity entity)
+    public async Task Create(BookEntity entity)
     {
-        await Task.Delay(400);
-        var books = _db.Books as List<BookEntity>;
-        
-        entity.Id = books.Max(a => a.Id) + 1;
-        books.Add(entity);
-        
-        return entity;
+        await _libraryManagementDbContext.Books.AddAsync(entity);
+        await _libraryManagementDbContext.SaveChangesAsync();
     }
 
-    public async Task<BookEntity> Update(int id, BookEntity entity)
+    public async Task Update(int id, BookEntity entity)
     {
-        await Task.Delay(400);
-        var books = _db.Books as List<BookEntity>;
+        var book = await _libraryManagementDbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(book);
         
-        var updatedBook = books.FirstOrDefault(b => b.Id == id);
+        book.Title = entity.Title;
+        book.PublishYear = entity.PublishYear;
+        book.AuthorId = entity.AuthorId;
         
-        updatedBook.Title = entity.Title;
-        updatedBook.PublishYear = entity.PublishYear;
-        
-        return updatedBook;
+        await _libraryManagementDbContext.SaveChangesAsync();
     }
 
     public async Task Delete(int id)
     {
-        await Task.Delay(400);
+        var book = await _libraryManagementDbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+        CheckForNull(book);
         
-        var books = _db.Books as List<BookEntity>;
-        books.Remove(books.FirstOrDefault(a => a.Id == id));
+        _libraryManagementDbContext.Books.Remove(book);
+        await _libraryManagementDbContext.SaveChangesAsync();
+    }
+
+    private void CheckForNull(BookEntity entity)
+    {
+        if (entity == null)
+            throw new NullReferenceException($"Book not found");
     }
 }

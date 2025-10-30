@@ -4,9 +4,9 @@ namespace Domain.Abstractions.Repositories;
 
 public interface IBookRepository
 {
-    public Task<IReadOnlyCollection<BookEntity>> GetAll();
+    public IQueryable<BookEntity> GetAll();
     public Task<BookEntity> GetById(int id);
-    public Task<BookEntity> Create(BookEntity entity);
-    public Task<BookEntity> Update(int id, BookEntity entity);
+    public Task Create(BookEntity entity);
+    public Task Update(int id, BookEntity entity);
     public Task Delete(int id);
 }
