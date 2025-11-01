@@ -1,29 +1,18 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Dto.AuthorsDto;
 using Application.Implementation.Queries.Author;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using MediatR;
 
 namespace Application.Implementation.Handers.Queries.Author;
 
-public class GetAllAuthorsQueryHandler : IRequestHandler<GetAllAuthorsQuery,  IEnumerable<AuthorResponseWithBookCountDto>>
+public class GetAllAuthorsQueryHandler(IAuthorRepository authorRepository, IMapper mapper)
+    : IRequestHandler<GetAllAuthorsQuery, IEnumerable<AuthorResponseDto>>
 {
-    private readonly IBusinessRuleValidationService _businessRuleValidationService;
-    private readonly IAuthorsFilteringService _authorsFilteringService;
-    
-
-    public GetAllAuthorsQueryHandler(IBusinessRuleValidationService businessRuleValidationService,  IAuthorsFilteringService authorsFilteringService)
+    public async Task<IEnumerable<AuthorResponseDto>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
     {
-        _authorsFilteringService = authorsFilteringService;
-        _businessRuleValidationService = businessRuleValidationService;
-    }
-    
-    public async Task<IEnumerable<AuthorResponseWithBookCountDto>> Handle(GetAllAuthorsQuery request, CancellationToken cancellationToken)
-    {
-        var authors = await _authorsFilteringService.ApplyFiltering(request.AuthorFilteringDto);
-        _businessRuleValidationService.CheckObjectForNull(authors, "Authors not found");
+        var authors = await authorRepository.GetAll(request.AuthorFilteringDto);
         
-        return authors;
+        return mapper.Map<IEnumerable<AuthorResponseDto>>(authors);
     }
 }

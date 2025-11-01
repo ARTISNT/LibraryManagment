@@ -1,8 +1,6 @@
-using Application.Abstractions.Services;
-using Application.Implementation.Commands.Author;
+using Application.Abstractions.Repositories;
 using Application.Implementation.Commands.Book;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using Domain.Models.Entities;
 using MediatR;
 
@@ -10,13 +8,14 @@ namespace Application.Implementation.Handers.Commands.Book;
 
 public class UpdateBookCommandHandler(
     IBookRepository bookRepository,
-    IMapper mapper,
-    IBusinessRuleValidationService businessRuleValidationService)
+    IMapper mapper)
     : IRequestHandler<UpdateBookCommand, int>
 {
     public async Task<int> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
     {
-        businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
+        if(request.Id <= 0)
+            throw new ArgumentOutOfRangeException(nameof(request.Id));
+        
         var book = mapper.Map<BookEntity>(request.BookDto);
         await bookRepository.Update(request.Id, book);
         

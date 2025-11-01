@@ -1,10 +1,6 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Implementation.Queries.Author;
-using Application.Implementation.Services;
-using Application.Implementation.Services.Filtering.Authors;
-using Application.Implementation.Services.Filtering.Books;
 using Application.Mapping.AutoMappingProfiles;
-using Domain.Abstractions.Repositories;
 using Infrastructure.DB.Context;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +11,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthorsFilteringService, AuthorFilteringService>();
-        services.AddScoped<IBooksFilteringService, BooksFilteringService>();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<IBookRepository, BookRepository>(); 
-        services.AddScoped<IBusinessRuleValidationService, BusinessRuleValidationServiceService>();
         
         return services;
     }

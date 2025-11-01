@@ -1,6 +1,6 @@
+using Application.Abstractions.Repositories;
 using Application.Implementation.Commands.Author;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using Domain.Models.Entities;
 using MediatR;
 
@@ -11,6 +11,9 @@ public class CreateAuthorCommandHandler(IAuthorRepository authorRepository, IMap
 {
     public async Task<int> Handle(CreateAuthorCommand request, CancellationToken cancellationToken)
     {
+        if(request is null)
+            throw new ArgumentNullException(nameof(request));
+        
         var author = mapper.Map<AuthorEntity>(request.AuthorDto);
         await authorRepository.Create(author);
         

@@ -1,18 +1,18 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Implementation.Commands.Author;
-using Domain.Abstractions.Repositories;
 using MediatR;
 
 namespace Application.Implementation.Handers.Commands.Author;
 
 public class DeleteAuthorCommandHandler(
-    IAuthorRepository repository,
-    IBusinessRuleValidationService businessRuleValidationService)
+    IAuthorRepository repository)
     : IRequestHandler<DeleteAuthorCommand>
 {
     public async Task Handle(DeleteAuthorCommand request, CancellationToken cancellationToken)
     {
-        businessRuleValidationService.CheckForValidId(request.Id, "Id is not valid"); 
+        if(request.Id <= 0)
+            throw new ArgumentOutOfRangeException(nameof(request.Id));
+        
         await repository.Delete(request.Id);
     }
 }

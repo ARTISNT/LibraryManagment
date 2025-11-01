@@ -1,19 +1,18 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Implementation.Commands.Book;
-using AutoMapper;
-using Domain.Abstractions.Repositories;
 using MediatR;
 
 namespace Application.Implementation.Handers.Commands.Book;
 
 public class DeleteBookCommandHandler(
-    IBookRepository bookRepository,
-    IBusinessRuleValidationService businessRuleValidationService)
+    IBookRepository bookRepository)
     : IRequestHandler<DeleteBookCommand>
 {
     public async Task Handle(DeleteBookCommand request, CancellationToken cancellationToken)
     {
-        businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
+        if(request.Id <= 0)
+            throw new ArgumentOutOfRangeException(nameof(request.Id));
+        
         await bookRepository.Delete(request.Id);
     }
 }

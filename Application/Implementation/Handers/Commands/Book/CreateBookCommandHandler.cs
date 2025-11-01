@@ -1,6 +1,6 @@
+using Application.Abstractions.Repositories;
 using Application.Implementation.Commands.Book;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using Domain.Models.Entities;
 using MediatR;
 
@@ -11,6 +11,9 @@ public class CreateBookCommandHandler(IBookRepository bookRepository, IMapper ma
 {
     public async Task<int> Handle(CreateBookCommand request, CancellationToken cancellationToken)
     {
+        if (request is null)
+            throw new ArgumentNullException(nameof(request));
+        
         var book = mapper.Map<BookEntity>(request.BookDto);
         await bookRepository.Create(book);
         

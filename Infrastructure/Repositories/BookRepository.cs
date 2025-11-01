@@ -1,15 +1,20 @@
-using Domain.Abstractions.Repositories;
+using Application.Abstractions.Repositories;
+using Application.Dto.BookDto;
 using Domain.Models.Entities;
 using Infrastructure.DB.Context;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class BookRepository(LibraryManagementDbContext libraryManagementDbContext) : IBookRepository
 {
-    public IQueryable<BookEntity> GetAll()
+    public async Task<IEnumerable<BookEntity>> GetAll(BookFilteringDto bookFilteringDto)
     {
-        return libraryManagementDbContext.Books;
+        return await libraryManagementDbContext
+            .Books
+            .ApplyFiltering(bookFilteringDto)
+            .ToListAsync();
     }
 
     public async Task<BookEntity?> GetById(int id)

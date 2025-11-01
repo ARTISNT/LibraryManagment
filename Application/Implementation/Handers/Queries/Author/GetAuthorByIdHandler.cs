@@ -1,32 +1,23 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Dto.AuthorsDto;
 using Application.Implementation.Queries.Author;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using MediatR;
 
 namespace Application.Implementation.Handers.Queries.Author;
 
-public class GetAuthorByIdHandler :  IRequestHandler<GetAuthorByIdQuery, AuthorResponseDto>
+public class GetAuthorByIdHandler(IAuthorRepository repository, IMapper mapper)
+    : IRequestHandler<GetAuthorByIdQuery, AuthorResponseDto>
 {
-    private readonly IAuthorRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly IBusinessRuleValidationService _businessRuleValidationService;
-
-    public GetAuthorByIdHandler(IAuthorRepository repository,  IMapper mapper, IBusinessRuleValidationService businessRuleValidationService)
-    {
-        _repository = repository;
-        _mapper = mapper;
-        _businessRuleValidationService = businessRuleValidationService;
-    }
-    
     public async Task<AuthorResponseDto> Handle(GetAuthorByIdQuery request, CancellationToken cancellationToken)
     {
-        _businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
+        if(request.Id >= 0)
+            throw new ArgumentOutOfRangeException(nameof(request.Id));
         
-        var author = await _repository.GetById(request.Id);
-        _businessRuleValidationService.CheckObjectForNull(author, "Author not found");
+        var author = await repository.GetById(request.Id);
+        if(author is null)
+            throw new NullReferenceException("Author not found");
         
-        return _mapper.Map<AuthorResponseDto>(author);
+        return mapper.Map<AuthorResponseDto>(author);
     }
 }

@@ -1,15 +1,20 @@
-using Domain.Abstractions.Repositories;
+using Application.Abstractions.Repositories;
+using Application.Dto.AuthorsDto;
 using Domain.Models.Entities;
 using Infrastructure.DB.Context;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class AuthorRepository(LibraryManagementDbContext libraryManagementDbContext) : IAuthorRepository
 {
-    public IQueryable<AuthorEntity> GetAll()
+    public async Task<IEnumerable<AuthorEntity>> GetAll(AuthorFilteringDto  authorFilteringDto)
     {
-        return libraryManagementDbContext.Authors.AsQueryable();
+        return await libraryManagementDbContext
+            .Authors
+            .ApplyFiltering(authorFilteringDto)
+            .ToListAsync();
     }
 
     public async Task<AuthorEntity?> GetById(int id)

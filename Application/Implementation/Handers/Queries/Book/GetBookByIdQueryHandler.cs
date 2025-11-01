@@ -1,31 +1,23 @@
-using Application.Abstractions.Services;
+using Application.Abstractions.Repositories;
 using Application.Dto.BookDto;
 using Application.Implementation.Queries.Book;
 using AutoMapper;
-using Domain.Abstractions.Repositories;
 using MediatR;
 
 namespace Application.Implementation.Handers.Queries.Book;
 
-public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDtoResponse>
+public class GetBookByIdQueryHandler(IBookRepository bookRepository, IMapper mapper)
+    : IRequestHandler<GetBookByIdQuery, BookDtoResponse>
 {
-    private readonly IBookRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly IBusinessRuleValidationService _businessRuleValidationService;
-
-    public GetBookByIdQueryHandler(IBookRepository bookRepository, IMapper mapper,  IBusinessRuleValidationService businessRuleValidationService)
-    {
-        _repository = bookRepository;
-        _mapper = mapper;
-        _businessRuleValidationService = businessRuleValidationService;
-    }
-
     public async Task<BookDtoResponse> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
     {
-        _businessRuleValidationService.CheckForValidId(request.Id, "Not valid Id");
-        var book = await _repository.GetById(request.Id);
-        _businessRuleValidationService.CheckObjectForNull(book, "Book not found");
+        if(request.Id >= 0)
+            throw new ArgumentOutOfRangeException(nameof(request.Id));
         
-        return _mapper.Map<BookDtoResponse>(book);
+        var book = await bookRepository.GetById(request.Id);
+        if(book is null)
+            throw new NullReferenceException("Book not found");
+        
+        return mapper.Map<BookDtoResponse>(book);
     }
 }
