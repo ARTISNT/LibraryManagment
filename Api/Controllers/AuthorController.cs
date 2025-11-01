@@ -8,26 +8,19 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthorController : ControllerBase
+public class AuthorController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender;
-    
-    public AuthorController(ISender sender)
-    {
-        _sender = sender;
-    }
-    
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] AuthorFilteringDto filteringDto)
     {
-        var authors = await _sender.Send(new GetAllAuthorsQuery(filteringDto));
+        var authors = await sender.Send(new GetAllAuthorsQuery(filteringDto));
         return Ok(authors); 
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        var author = await _sender.Send(new GetAuthorByIdQuery(id));
+        var author = await sender.Send(new GetAuthorByIdQuery(id));
         return Ok(author);
     }
 
@@ -37,7 +30,7 @@ public class AuthorController : ControllerBase
         if(!ModelState.IsValid)
             return BadRequest(ModelState);
         
-        await _sender.Send(new UpdateAuthorCommand(id, author));
+        await sender.Send(new UpdateAuthorCommand(id, author));
         return NoContent();
     }
 
@@ -47,14 +40,14 @@ public class AuthorController : ControllerBase
         if(!ModelState.IsValid)
             return BadRequest(ModelState);
         
-        var result = await _sender.Send(new CreateAuthorCommand(authorInput));
+        var result = await sender.Send(new CreateAuthorCommand(authorInput));
         return CreatedAtAction(nameof(GetById), new { Id = result }, null);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        await _sender.Send(new DeleteAuthorCommand(id));
+        await sender.Send(new DeleteAuthorCommand(id));
         return NoContent();
     }
 }

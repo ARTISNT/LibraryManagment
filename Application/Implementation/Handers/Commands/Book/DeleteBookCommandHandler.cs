@@ -6,20 +6,14 @@ using MediatR;
 
 namespace Application.Implementation.Handers.Commands.Book;
 
-public class DeleteBookCommandHandler :  IRequestHandler<DeleteBookCommand>
+public class DeleteBookCommandHandler(
+    IBookRepository bookRepository,
+    IBusinessRuleValidationService businessRuleValidationService)
+    : IRequestHandler<DeleteBookCommand>
 {
-    private readonly IBookRepository _bookRepository;
-    private readonly IBusinessRuleValidationService _businessRuleValidationService;
-
-    public DeleteBookCommandHandler(IBookRepository bookRepository,  IBusinessRuleValidationService businessRuleValidationService)
-    {
-        _bookRepository = bookRepository;
-        _businessRuleValidationService = businessRuleValidationService;
-    }
-    
     public async Task Handle(DeleteBookCommand request, CancellationToken cancellationToken)
     {
-        _businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
-        await _bookRepository.Delete(request.Id);
+        businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
+        await bookRepository.Delete(request.Id);
     }
 }

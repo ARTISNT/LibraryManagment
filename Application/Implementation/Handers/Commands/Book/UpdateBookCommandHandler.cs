@@ -8,24 +8,17 @@ using MediatR;
 
 namespace Application.Implementation.Handers.Commands.Book;
 
-public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, int>
+public class UpdateBookCommandHandler(
+    IBookRepository bookRepository,
+    IMapper mapper,
+    IBusinessRuleValidationService businessRuleValidationService)
+    : IRequestHandler<UpdateBookCommand, int>
 {
-    private readonly IBookRepository _bookRepository;
-    private readonly IMapper _mapper;
-    private readonly IBusinessRuleValidationService  _businessRuleValidationService;
-
-    public UpdateBookCommandHandler(IBookRepository bookRepository, IMapper mapper,  IBusinessRuleValidationService businessRuleValidationService)
-    {
-        _bookRepository = bookRepository;
-        _mapper = mapper;
-        _businessRuleValidationService = businessRuleValidationService;
-    }
-    
     public async Task<int> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
     {
-        _businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
-        var book = _mapper.Map<BookEntity>(request.BookDto);
-        await _bookRepository.Update(request.Id, book);
+        businessRuleValidationService.CheckForValidId(request.Id, "Not valid id");
+        var book = mapper.Map<BookEntity>(request.BookDto);
+        await bookRepository.Update(request.Id, book);
         
         return book.Id;
     }

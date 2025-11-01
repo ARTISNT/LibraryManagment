@@ -38,6 +38,12 @@ public class GlobalExceptionFilter : IExceptionFilter
                 argumentOutOfRange.Message,
                 StatusCodes.Status400BadRequest,
                 "Id should be greater than or equal to zero."
+                ),
+            _ => 
+            (
+                "Something went wrong",
+                StatusCodes.Status500InternalServerError,
+                "Something went wrong, Please try again, or contact the administrator."
                 )
         };
 
